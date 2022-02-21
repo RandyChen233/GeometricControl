@@ -74,7 +74,10 @@ Rc = [b1c, b2c, b3c]; %eqn(22)
 
 
 %% question:how should I obtain b1c_dot,b2c_dot, and b3c_dot so I can get Rc_dot? 
-%% I need Rc_dot because it is used in Eqn 22, which is later substituted in Eqn. 21 to get eW (error.Omega)
+% I need Rc_dot because it is used in Eqn 22, which is later substituted in Eqn. 21 
+% to get eW (error.Omega) and is again subsituted in Eqn. 20 to get the
+% control moment 
+
 
 Wc = vee(Rc' * Rc_dot); %eqn(22) -> vee map is the inverse of hat map
 
@@ -84,7 +87,7 @@ eW = W - R' * Rc * Wc; %eqn(21)
 M = - kR * eR ...
     - kW * eW ...
     + hat(R' * Rc * Wc) * param.J * R' * Rc * Wc ...
-    + param.J * R' * Rc * Wc_dot; %eqn
+    + param.J * R' * Rc * Wc_dot; %eqn(20).
 
 
 
