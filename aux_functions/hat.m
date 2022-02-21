@@ -5,3 +5,4 @@ hat_x = [0 -x(3) x(2);
     -x(2) x(1) 0];
 
 end
+% 3x3 skew symmetric matrix representation of a 3-vector

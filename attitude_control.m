@@ -25,7 +25,7 @@
 
 function [f,M, eR, eW] = attitude_control( ...
     X,R, W,  ...  % states
-    Rd, Wd, ...  % desired values
+    Rd, Wd, Wd_dot ...  % desired values
     k, param ...  % gains and parameters
 )
 % [M, eI_dot, eR, eW] = attitude_control(R, W, eI, Rd, Wd, Wddot, k, param)
@@ -57,10 +57,6 @@ function [f,M, eR, eW] = attitude_control( ...
 % Unpack states
 [x, v, R, W] = split_to_states(X);
 
-
-m = param.m;
-g = param.g;
-
 eR = 1 / 2 * vee(Rd' * R - R' * Rd); %eqn(8)
 eW = W - R' * Rd * Wd; %eqn(9)
 
@@ -71,7 +67,6 @@ kV = k.v;
 
 M = - kR * eR ...
     - kW * eW ...
-    - k.I * eI ...
     + hat(R' * Rd * Wd) * param.J * R' * Rd * Wd ...
     + param.J * R' * Rd * Wd_dot;  
 %eqn（11)
