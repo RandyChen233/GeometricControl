@@ -66,11 +66,26 @@ error.v = v - desired.v; %eqn(18)
 
 f = dot((k.x * error.x + k.v * error.v + m * g * e3 - m * desired.x_2dot),R * e3); %eqn(19)
 
-[b3c] = deriv_unit_vector(-(k.x * error.x + k.v * error.v + m * g * e3 - m * desired.x_2dot)); %eqn(23)
-b1c = -cross(b3c,cross(b3c,desired.x))/norm(cross(b3c,desired.x)); %eqn(38)
-b2c = cross(b3c,b1c); 
+A = -k.x * error.x - k.v * error.v -m * g * e3 +m * desired.x_2dot; %Appendix F
+A_dot = -k.x * error.v + m * desired.x_3dot;
+A_ddot = m * desired.x_4dot;
+
+[b3c,b3c_dot,b3c_ddot] = deriv_unit_vector(-A,-A_dot,-A_ddot); %eqn(23)
+
+C = hat(b3c) * desired.b1; %Appendix F
+C_dot = hat(b3c_dot) * desired.b1 + hat(b3c) * desired.b1_dot; 
+C_ddot = hat(b3c_ddot) * desired.b1 + hat(b3c_dot) * desired.b1_dot + hat(b3c_dot) * desired.b1_dot + hat(b3c) * desired.b1_2dot;
+
+[b2c,b2c_dot,b2c_ddot] = deriv_unit_vector(-C,-C_dot,-C_ddot); % %Appendix F
+
+b1c = hat(b2c) * b3c; %eqn(38), Appendix F
+b1c_dot = hat(b2c_dot) * b3c + hat(b2c) * b3c_dot;
+b1c_ddot = hat(b2c_ddot) * b3c + 2*hat(b2c_dot) * b3c_dot + hat(b2c) * b3c_ddot;
+
+
 Rc = [b1c, b2c, b3c]; %eqn(22)
-%b1c_dot
+Rc_dot = [b1c_dot,b2c_dot,b3c_dot];
+Rc_ddot = [b1c_ddot,b2c_ddot,b3c_ddot];
 
 
 %% question:how should I obtain b1c_dot,b2c_dot, and b3c_dot so I can get Rc_dot? 
@@ -80,6 +95,7 @@ Rc = [b1c, b2c, b3c]; %eqn(22)
 
 
 Wc = vee(Rc' * Rc_dot); %eqn(22) -> vee map is the inverse of hat map
+Wc_dot = vee( Rc' * Rc_ddot - hat(Wc)^2); % eqn(97) in Appendix F
 
 eR = 1 / 2 * vee(Rd' * R - R' * Rd); %eqn(21)
 eW = W - R' * Rc * Wc; %eqn(21)
@@ -88,20 +104,19 @@ M = - kR * eR ...
     - kW * eW ...
     + hat(R' * Rc * Wc) * param.J * R' * Rc * Wc ...
     + param.J * R' * Rc * Wc_dot; %eqn(20).
-
-
-
-
-
+end
 %% run attitude controller 
-[f,M, error.R, error.W] = attitude_control( ...
+%question: should I embed the attitude controller in the postion controller?
+
+[f,M, eR, eW] = attitude_control( ...
     X,R, W,  ...  % states
-    Rc, desired.w, desired.w_dot, ...  % desired values
+    Rd, Wd, Wd_dot ...  % desired values
     k, param ...  % gains and parameters
 )
-
 error.y = 0;
 error.Wy = 0;
+
+
 
 %% Saving data
 calculated.b3 = b3c;
