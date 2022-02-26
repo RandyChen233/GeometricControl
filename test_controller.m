@@ -108,14 +108,18 @@ xlabel_ = 'time (s)';
 
 figure;
 plot_3x1(t, e.R, '', xlabel_, 'e_R', linetype, linewidth)
+legend('Rotation error vs time')
 set(gca, 'FontName', 'Times New Roman');
+
 
 figure;
 plot_3x1(t, e.x, '', xlabel_, 'e_x', linetype, linewidth)
+legend('Position error vs time');
 set(gca, 'FontName', 'Times New Roman');
 
 figure;
 plot_3x1(t, e.v, '', xlabel_, 'e_v', linetype, linewidth)
+legend('Velocity error vs time');
 set(gca, 'FontName', 'Times New Roman');
 
 %figure;
@@ -135,6 +139,8 @@ figure;
 plot_3x1(t, x, '', xlabel_, 'x', linetype, linewidth)
 plot_3x1(t, d.x, '', xlabel_, 'x', 'r', linewidth)
 set(gca, 'FontName', 'Times New Roman');
+legend('State vs time','State vs time(with uncertainty)');
+
 
 figure;
 plot3(x(1,:), x(2,:), x(3,:), 'k');
@@ -148,3 +154,4 @@ zlabel('$x_3$', 'interpreter', 'latex');
 set(gca, 'Box', 'on');
 grid on;
 set(gca, 'FontName', 'Times New Roman');
+legend('Simulated trajectory','Desired Trajectory');
