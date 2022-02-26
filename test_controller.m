@@ -62,7 +62,7 @@ x0 = [0, 0, 0]';
 v0 = [0, 0, 0]';
 R0 = expm(pi * hat([0, 0, 1]'));
 W0 = [0, 0, 0]';
-X0 = [x0; v0; W0; reshape(R0,9,1); zeros(6,1)];
+X0 = [x0; v0; W0; reshape(R0,9,1)];% zeros(6,1)];
 
 %% Numerical integration
 [t, X] = ode45(@(t, XR) eom(t, XR, k, param), t, X0, ...
@@ -118,17 +118,18 @@ figure;
 plot_3x1(t, e.v, '', xlabel_, 'e_v', linetype, linewidth)
 set(gca, 'FontName', 'Times New Roman');
 
-figure;
-plot_3x1(t, eI .* [k.I, k.I, k.yI]', '', xlabel_, 'e', linetype, linewidth)
-plot_3x1(t, param.R_delta .* ones(3, N), ...
-    '', xlabel_, 'e_I', 'r', linewidth)
-set(gca, 'FontName', 'Times New Roman');
+%figure;
+%plot_3x1(t, eI .* [k.I, k.I, k.yI]', '', xlabel_, 'e', linetype, linewidth)
+%plot_3x1(t, param.R_delta .* ones(3, N), ...
+%   '', xlabel_, 'e_I', 'r', linewidth)
+%set(gca, 'FontName', 'Times New Roman');
 
-figure;
-plot_3x1(t, ei * k.i, '', xlabel_, 'e_i', linetype, linewidth)
-plot_3x1(t, param.x_delta .* ones(3, N), ...
-    '', xlabel_, 'e_i', 'r', linewidth)
-set(gca, 'FontName', 'Times New Roman');
+
+%figure;
+%plot_3x1(t, ei * k.i, '', xlabel_, 'e_i', linetype, linewidth)
+%plot_3x1(t, param.x_delta .* ones(3, N), ...
+%    '', xlabel_, 'e_i', 'r', linewidth)
+%set(gca, 'FontName', 'Times New Roman');
 
 figure;
 plot_3x1(t, x, '', xlabel_, 'x', linetype, linewidth)

@@ -35,12 +35,9 @@ desired.x_4dot = [A * a^4 * sin(a * t + d), ...
     B * b^4 * sin(b * t), ...
     C * c^4 * cos(c * t)]';
 
-desired.w = [2 * pi / 10 , 0 , 0 ]'; %desired angular velocity
-desired.w_dot = 0;
-desired.w_ddot = 0;
-
-desired.b1 = [cos(desired.w * t), sin(desired.w * t), 0]';
-desired.b1_dot = desired.w * [-sin(desired.w * t), cos(desired.w * t), 0]';
-desired.b1_2dot = desired.w^2 * [-cos(desired.w * t), -sin(desired.w * t), 0]';
+w = 2 * pi / 10;
+desired.b1 = [cos(w * t), sin(w * t), 0]';
+desired.b1_dot = w * [-sin(w * t), cos(w * t), 0]';
+desired.b1_2dot = w^2 * [-cos(w * t), -sin(w * t), 0]';
 
 end

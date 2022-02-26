@@ -1,0 +1,16 @@
+[f,M, ev, eW] = attitude_control( ...
+    X,R, W,  ...  % states
+    Rd, Wd, Wd_dot ...  % desired values
+    k, param ...  % gains and parameters
+)
+
+[x, v, R, W] = split_to_states(X);
+
+
+m = param.m;
+g = param.g;
+
+
+ev = v - desired.v;
+
+f = k.v * ev + m * g

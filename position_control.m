@@ -53,70 +53,73 @@ function [f, M, error, calculated] ...
 % Unpack states
 [x, v, R, W] = split_to_states(X);
 
-
 m = param.m; %mass
 g = param.g; %gravity
 e3 = [0, 0, 1]'; %z-axis of world frame
 e2 = [0, 1, 0]'; %y-axis of world frame
 e1 = [1, 0, 0]'; %x-axis of world frame
 
-error.x = x - desired.x; %eqn(17)
-error.v = v - desired.v; %eqn(18)
+error.x = x - desired.x; %eqn(17), Geometric Methods on SE(3)
+error.v = v - desired.v; %eqn(18), Geometric Methods on SE(3)
 
+A = -k.x * error.x - k.v * error.v -m * g * e3 +m * desired.x_2dot; %Appendix F, Control of Complex Maneuvers...
+b3 = R * e3; % eqn(3), Decoupled Yaw Control
+f = -dot(A, b3); %eqn(32), Decoupled Yaw Control
+ea = g * e3 ... % eqn(41), Decoupled Yaw Control
+    - f / m * b3 ...
+    - desired.x_2dot ...
+    + param.x_delta / m;
 
-f = dot((k.x * error.x + k.v * error.v + m * g * e3 - m * desired.x_2dot),R * e3); %eqn(19)
+A_dot = - k.x * error.v ...  % derivative of A
+    - k.v * ea ...
+    + m * desired.x_3dot ...;
 
-A = -k.x * error.x - k.v * error.v -m * g * e3 +m * desired.x_2dot; %Appendix F
-A_dot = -k.x * error.v + m * desired.x_3dot;
-A_ddot = m * desired.x_4dot;
+b3_dot = R * hat(W) * e3; %eqn 22 (Decoupled Yaw Control)
+f_dot = -dot(A_dot, b3) - dot(A, b3_dot);
+eb = - f_dot / m * b3 - f / m * b3_dot - desired.x_3dot; %time derivative of ea
+A_ddot = - k.x * ea ...
+    - k.v * eb ...
+    + m * desired.x_4dot ...;
 
-[b3c,b3c_dot,b3c_ddot] = deriv_unit_vector(-A,-A_dot,-A_ddot); %eqn(23)
+[b3c,b3c_dot,b3c_ddot] = deriv_unit_vector(-A,-A_dot,-A_ddot); %Appendix F, Control of Complex Maneuvers V3...
 
-C = hat(b3c) * desired.b1; %Appendix F
+C = hat(b3c) * desired.b1; %Appendix F, Control of Complex Maaneuvers...
 C_dot = hat(b3c_dot) * desired.b1 + hat(b3c) * desired.b1_dot; 
 C_ddot = hat(b3c_ddot) * desired.b1 + hat(b3c_dot) * desired.b1_dot + hat(b3c_dot) * desired.b1_dot + hat(b3c) * desired.b1_2dot;
 
-[b2c,b2c_dot,b2c_ddot] = deriv_unit_vector(-C,-C_dot,-C_ddot); % %Appendix F
+[b2c,b2c_dot,b2c_ddot] = deriv_unit_vector(-C,-C_dot,-C_ddot); % %Appendix F, Control of Complex Maneuvers...
 
-b1c = hat(b2c) * b3c; %eqn(38), Appendix F
-b1c_dot = hat(b2c_dot) * b3c + hat(b2c) * b3c_dot;
-b1c_ddot = hat(b2c_ddot) * b3c + 2*hat(b2c_dot) * b3c_dot + hat(b2c) * b3c_ddot;
-
-
-Rc = [b1c, b2c, b3c]; %eqn(22)
-Rc_dot = [b1c_dot,b2c_dot,b3c_dot];
-Rc_ddot = [b1c_ddot,b2c_ddot,b3c_ddot];
+b1c = hat(b2c) * b3c; %eqn(36), Control of Complex Maneuvers
+b1c_dot = hat(b2c_dot) * b3c + hat(b2c) * b3c_dot; %Appendix F, Control of Complex Maneuvers
+b1c_ddot = hat(b2c_ddot) * b3c ...
+    + 2 * hat(b2c_dot) * b3c_dot ...
+    + hat(b2c) * b3c_ddot;
 
 
-%% question:how should I obtain b1c_dot,b2c_dot, and b3c_dot so I can get Rc_dot? 
-% I need Rc_dot because it is used in Eqn 22, which is later substituted in Eqn. 21 
-% to get eW (error.Omega) and is again subsituted in Eqn. 20 to get the
-% control moment 
+Rc = [b1c, b2c, b3c]; %eqn (22), ...Complex Maneuvers
+Rc_dot = [b1c_dot, b2c_dot, b3c_dot];
+Rc_ddot = [b1c_ddot, b2c_ddot, b3c_ddot];
 
+Wc = vee(Rc' * Rc_dot); %eqn(22), ...Complex Maneuvers... -> vee map is the inverse of hat map
+Wc_dot = vee( Rc' * Rc_ddot - hat(Wc)^2); % eqn(97) ... Complex Maneuvers
 
-Wc = vee(Rc' * Rc_dot); %eqn(22) -> vee map is the inverse of hat map
-Wc_dot = vee( Rc' * Rc_ddot - hat(Wc)^2); % eqn(97) in Appendix F
+eR = 1 / 2 * vee(Rc' * R - R' * Rc); %eqn(21)  ...Complex Maneuvers
+eW = W - R' * Rc * Wc; %eqn(21)  ...Complex Maneuvers
 
-eR = 1 / 2 * vee(Rd' * R - R' * Rd); %eqn(21)
-eW = W - R' * Rc * Wc; %eqn(21)
-
-M = - kR * eR ...
-    - kW * eW ...
+M = - k.R * eR ...
+    - k.W * eW ...
     + hat(R' * Rc * Wc) * param.J * R' * Rc * Wc ...
-    + param.J * R' * Rc * Wc_dot; %eqn(20).
-end
-%% run attitude controller 
-%question: should I embed the attitude controller in the postion controller?
+    + param.J * R' * Rc * Wc_dot; %eqn(20)  ...Complex Maneuvers
 
-[f,M, eR, eW] = attitude_control( ...
-    X,R, W,  ...  % states
-    Rd, Wd, Wd_dot ...  % desired values
-    k, param ...  % gains and parameters
-)
+
+%% run attitude controller 
+
+[M,  error.R, error.W] = attitude_control( ...
+        R, W,  ...
+        Rc, Wc, Wc_dot, ...
+        k, param);
 error.y = 0;
 error.Wy = 0;
-
-
 
 %% Saving data
 calculated.b3 = b3c;
@@ -126,7 +129,5 @@ calculated.b1 = b1c;
 calculated.R = Rc;
 calculated.W = Wc;
 calculated.W_dot = Wc_dot;
-%calculated.W3 = dot(R * e3, Rc * Wc);
-%calculated.W3_dot = dot(R * e3, Rc * Wc_dot) ...
-%    + dot(R * hat(W) * e3, Rc * Wc);
+
 end
