@@ -6,7 +6,10 @@ J = param.J;
 
 [~, v, R, W] = split_to_states(X);
 
-desired = command(t);
+
+desired = command_lissajous(t);
+
+    
 [f, M, ~, ~] = position_control(X, desired, k, param);
 
 xdot = v;

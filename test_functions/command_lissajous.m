@@ -12,7 +12,7 @@ a = 1;
 b = 2;
 c = 2;
 alt = -1;
-%t = 0:0.1:25; %time
+t = 0:0.1:25; %time
 waypts = [A * sin(a *t + d);B * sin(b * t);alt + C * cos(2 * t)];
 
 v0 = [0,0,0];
@@ -97,9 +97,9 @@ desired.x_4dot = [sxx,syy,szz]';
 
 w = 2 * pi / 10;
 %t = linspace(0,t(end),size(xx,2));
-desired.b1 = [cos(w * t), sin(w * t), 0]';
-desired.b1_dot = w * [-sin(w * t), cos(w * t),0]';
-desired.b1_2dot = w^2 * [-cos(w * t), -sin(w * t), 0]';
+desired.b1 = [cos(w * t),sin(w * t), zeros(1,length(t))]';
+desired.b1_dot = w * [-sin(w * t),cos(w * t),zeros(1,length(t))]';
+desired.b1_2dot = w^2 * [-cos(w * t),-sin(w * t), zeros(1,length(t))]';
 
 
 end

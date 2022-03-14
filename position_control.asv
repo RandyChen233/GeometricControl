@@ -59,6 +59,7 @@ e3 = [0, 0, 1]'; %z-axis of world frame
 e2 = [0, 1, 0]'; %y-axis of world frame
 e1 = [1, 0, 0]'; %x-axis of world frame
 
+
 error.x = x - desired.x; %eqn(17), Geometric Methods on SE(3)
 error.v = v - desired.v; %eqn(18), Geometric Methods on SE(3)
 
@@ -72,7 +73,7 @@ ea = g * e3 ... % eqn(41), Decoupled Yaw Control
 
 A_dot = - k.x * error.v ...  % derivative of A
     - k.v * ea ...
-    + m * desired.x_3dot ...
+    + m * desired.x_3dot ...;
 
 b3_dot = R * hat(W) * e3; %eqn 22 (Decoupled Yaw Control)
 f_dot = -dot(A_dot, b3) - dot(A, b3_dot);
@@ -91,35 +92,35 @@ C_ddot = hat(b3c_ddot) * desired.b1 + hat(b3c_dot) * desired.b1_dot + hat(b3c_do
 
 b1c = hat(b2c) * b3c; %eqn(36), Control of Complex Maneuvers
 b1c_dot = hat(b2c_dot) * b3c + hat(b2c) * b3c_dot; %Appendix F, Control of Complex Maneuvers
-b1c_ddot = hat(b2c_ddot) * b3c + 2*hat(b2c_dot) * b3c_dot + hat(b2c) * b3c_ddot;
+b1c_ddot = hat(b2c_ddot) * b3c ...
+    + 2 * hat(b2c_dot) * b3c_dot ...
+    + hat(b2c) * b3c_ddot;
 
 
-Rc = [b1c, b2c, b3c]; %eqn(22)
-Rc_dot = [b1c_dot,b2c_dot,b3c_dot];
-Rc_ddot = [b1c_ddot,b2c_ddot,b3c_ddot];
+Rc = [b1c, b2c, b3c]; %eqn (22), ...Complex Maneuvers
+Rc_dot = [b1c_dot, b2c_dot, b3c_dot];
+Rc_ddot = [b1c_ddot, b2c_ddot, b3c_ddot];
 
-Wc = vee(Rc' * Rc_dot); %eqn(22) -> vee map is the inverse of hat map
-Wc_dot = vee( Rc' * Rc_ddot - hat(Wc)^2); % eqn(97) in Appendix F
+Wc = vee(Rc' * Rc_dot); %eqn(22), ...Complex Maneuvers... -> vee map is the inverse of hat map
+Wc_dot = vee( Rc' * Rc_ddot - hat(Wc)^2); % eqn(97) ... Complex Maneuvers
 
-eR = 1 / 2 * vee(Rd' * R - R' * Rd); %eqn(21)
-eW = W - R' * Rc * Wc; %eqn(21)
+eR = 1 / 2 * vee(Rc' * R - R' * Rc); %eqn(21)  ...Complex Maneuvers
+eW = W - R' * Rc * Wc; %eqn(21)  ...Complex Maneuvers
 
-M = - kR * eR ...
-    - kW * eW ...
+M = - k.R * eR ...
+    - k.W * eW ...
     + hat(R' * Rc * Wc) * param.J * R' * Rc * Wc ...
-    + param.J * R' * Rc * Wc_dot; %eqn(20).
+    + param.J * R' * Rc * Wc_dot; %eqn(20)  ...Complex Maneuvers
 
-end
+
 %% run attitude controller 
-%question: should I embed the attitude controller in the postion controller?
 
-[M, eI_dot, error.R, error.W] = attitude_control( ...
+[M,  error.R, error.W] = attitude_control( ...
         R, W,  ...
         Rc, Wc, Wc_dot, ...
         k, param);
 error.y = 0;
 error.Wy = 0;
-
 
 %% Saving data
 calculated.b3 = b3c;

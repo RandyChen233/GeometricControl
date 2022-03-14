@@ -25,13 +25,14 @@
 
 %%
 close all;
+clear all;
 addpath('aux_functions');
 addpath('test_functions');
-%addpath('minimum_snap');
+addpath('minimum_snap');
 
 
 %% Simulation parameters
-t = 0:0.01:20;
+t = 0:0.01:25;
 N = length(t);
 
 % Quadrotor
@@ -70,7 +71,7 @@ X0 = [x0; v0; W0; reshape(R0,9,1)];% zeros(6,1)];
 
 %% Numerical integration
 [t, X] = ode45(@(t, XR) eom(t, XR, k, param), t, X0, ...
-    odeset('RelTol', 1e-6, 'AbsTol', 1e-6));
+    odeset('RelTol', 1e-5, 'AbsTol', 1e-5));
 
 %% Post processing
 
@@ -86,7 +87,7 @@ W = X(:, 7:9)';
 for i = 1:N
     R(:,:,i) = reshape(X(i,10:18), 3, 3);
     
-    des = command(t(i));
+    des = command_lissajous(t(i));
     [f(i), M(:,i),err, calc] = position_control(X(i,:)', des, ...
         k, param);
     

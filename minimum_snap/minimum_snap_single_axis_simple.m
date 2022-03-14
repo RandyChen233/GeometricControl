@@ -19,10 +19,13 @@ beq = zeros(4*n_poly+2,1);
 Aeq(1:3,1:n_coef) = [calc_tvec(ts(1),n_order,0);
                      calc_tvec(ts(1),n_order,1);
                      calc_tvec(ts(1),n_order,2)];
+
 Aeq(4:6,n_coef*(n_poly-1)+1:n_coef*n_poly) = ...
                     [calc_tvec(ts(end),n_order,0);
                      calc_tvec(ts(end),n_order,1);
                      calc_tvec(ts(end),n_order,2)];
+
+
 beq(1:6,1) = [p0,v0,a0,pe,ve,ae]';
 
 % mid p constraints    (n_ploy-1 equations)
@@ -52,7 +55,7 @@ bieq = [];
 
 p = quadprog(Q_all,b_all,Aieq,bieq,Aeq,beq);
 
-polys = reshape(p,n_coef,n_poly);
+polys = reshape(p,n_coef,[]);
 
 end
 

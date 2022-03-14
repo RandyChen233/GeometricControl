@@ -21,7 +21,7 @@ v1 = [0,0,0];
 a1 = [0,0,0];
 T = t(end);
 ts = arrangeT(waypts,T);
-n_order = 5;
+n_order = 7;
 % trajectory plan
 polys_x = minimum_snap_single_axis_simple(waypts(1,:),ts,n_order,v0(1),a0(1),v1(1),a1(1));
 polys_y = minimum_snap_single_axis_simple(waypts(2,:),ts,n_order,v0(2),a0(2),v1(2),a1(2));
@@ -71,7 +71,7 @@ end
 
 %% saving data
 
-desired.x = [xx;yy;zz];
+desired.x = [xx,yy,zz]';
 desired.v = [vxx,vyy,vzz]';
 desired.x_2dot = [axx,ayy,azz]';
 desired.x_3dot = [jxx,jyy,jzz]';
@@ -98,7 +98,8 @@ desired.x_4dot = [sxx,syy,szz]';
 w = 2 * pi / 10;
 %t = linspace(0,t(end),size(xx,2));
 desired.b1 = [cos(w * t), sin(w * t), 0]';
-desired.b1_dot = w * [-sin(w * t), cos(w * t), 0]';
+desired.b1_dot = w * [-sin(w * t), cos(w * t),0]';
 desired.b1_2dot = w^2 * [-cos(w * t), -sin(w * t), 0]';
+
 
 end

@@ -59,6 +59,7 @@ e3 = [0, 0, 1]'; %z-axis of world frame
 e2 = [0, 1, 0]'; %y-axis of world frame
 e1 = [1, 0, 0]'; %x-axis of world frame
 
+
 error.x = x - desired.x; %eqn(17), Geometric Methods on SE(3)
 error.v = v - desired.v; %eqn(18), Geometric Methods on SE(3)
 

@@ -12,14 +12,14 @@ function demo1_minimum_snap_simple()
     b = 2;
     c = 2;
     alt = -1;
-    t = 0:0.1:25; %time
-    waypts = [A * sin(a *t + d);B * sin(b * t);alt + C * cos(2 * t)];
+    m = 0:0.1:25; %time
+    waypts = [A * sin(a *m+ d);B * sin(b * m);alt + C * cos(2 * m)];
 
     v0 = [0,0,0];
     a0 = [0,0,0];
     v1 = [0,0,0];
     a1 = [0,0,0];
-    T = t(end);
+    T = m(end);
     ts = arrangeT(waypts,T);
     n_order = 7;
     
