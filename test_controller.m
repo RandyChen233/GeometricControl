@@ -27,9 +27,11 @@
 close all;
 addpath('aux_functions');
 addpath('test_functions');
+%addpath('minimum_snap');
+
 
 %% Simulation parameters
-t = 0:0.01:10;
+t = 0:0.01:20;
 N = length(t);
 
 % Quadrotor
@@ -51,15 +53,17 @@ param.R_delta = [0.2, 1.0, -0.1]';
 param.g = 9.81;
 
 %% Controller gains 
-%chosen based on Section VII. of Control of Complex Maneuvers for a Quadrotor UAV using Geometric
-k.x = 16*param.m;
-k.v = 5.6*param.m;
+%chosen based on Section VII. of Control of Complex Maneuvers for a
+%Quadrotor UAV using Geometric...
+k.x = 32;
+k.v = 11.2;
 k.R = 8.81;
 k.W = 2.54;
 
 %% Initial conditions
 x0 = [0, 0, 0]';
 v0 = [0, 0, 0]';
+%a0 = [0, 0, 0]';
 R0 = expm(pi * hat([0, 0, 1]'));
 W0 = [0, 0, 0]';
 X0 = [x0; v0; W0; reshape(R0,9,1)];% zeros(6,1)];
