@@ -1,6 +1,6 @@
 
 function desired = command_lissajous(t)
-addpath('C:\Users\Randy666\Documents\projects\AdvancedControlsLab\L1 adaptive+geometric\minimum_snap');
+%addpath('C:\Users\Randy666\Documents\projects\AdvancedControlsLab\L1 adaptive+geometric\minimum_snap');
 %% condition
 A = 1;
 B = 1;
@@ -12,7 +12,7 @@ a = 1;
 b = 2;
 c = 2;
 alt = -1;
-t = 0:0.1:25; %time
+t = 0:0.1:15; %time
 waypts = [A * sin(a *t + d);B * sin(b * t);alt + C * cos(2 * t)];
 
 v0 = [0,0,0];
@@ -68,14 +68,14 @@ for i=1:size(polys_x,2)
 end
 
 
-
-%% saving data
-
-desired.x = [xx,yy,zz]';
-desired.v = [vxx,vyy,vzz]';
-desired.x_2dot = [axx,ayy,azz]';
-desired.x_3dot = [jxx,jyy,jzz]';
-desired.x_4dot = [sxx,syy,szz]';
+% saving data
+for i = 1:length(t)
+desired.x = [xx(i),yy(i),zz(i)]';
+desired.v = [vxx(i),vyy(i),vzz(i)]';
+desired.x_2dot = [axx(i),ayy(i),azz(i)]';
+desired.x_3dot = [jxx(i),jyy(i),jzz(i)]';
+desired.x_4dot = [sxx(i),syy(i),szz(i)]';
+end
 % 
 % desired.x = [A * sin(a *t + d),B * sin(b * t),alt + C * cos(2 * t)]';
 % 
@@ -97,9 +97,15 @@ desired.x_4dot = [sxx,syy,szz]';
 
 w = 2 * pi / 10;
 %t = linspace(0,t(end),size(xx,2));
-desired.b1 = [cos(w * t),sin(w * t), zeros(1,length(t))]';
-desired.b1_dot = w * [-sin(w * t),cos(w * t),zeros(1,length(t))]';
-desired.b1_2dot = w^2 * [-cos(w * t),-sin(w * t), zeros(1,length(t))]';
+for i = 1:length(t)
+desired.b1 = [cos(w * t(i)),sin(w * t(i)), 0]';
+desired.b1_dot = w * [-sin(w * t(i)),cos(w * t(i)),0]';
+desired.b1_2dot = w^2 * [-cos(w * t(i)),-sin(w * t(i)), 0]';
+end
+
+% desired.b1 = [cos(w * t),sin(w * t), zeros(1,length(t))]';
+% desired.b1_dot = w * [-sin(w * t),cos(w * t),zeros(1,length(t))]';
+% desired.b1_2dot = w^2 * [-cos(w * t),-sin(w * t), zeros(1,length(t))]';
 
 
 end

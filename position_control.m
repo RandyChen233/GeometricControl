@@ -59,9 +59,11 @@ e3 = [0, 0, 1]'; %z-axis of world frame
 e2 = [0, 1, 0]'; %y-axis of world frame
 e1 = [1, 0, 0]'; %x-axis of world frame
 
-
 error.x = x - desired.x; %eqn(17), Geometric Methods on SE(3)
 error.v = v - desired.v; %eqn(18), Geometric Methods on SE(3)
+
+% error.x = x - reshape(desired.x,3,[]); %eqn(17), Geometric Methods on SE(3)
+% error.v = v - reshape(desired.v,3,[]); %eqn(18), Geometric Methods on SE(3)
 
 A = -k.x * error.x - k.v * error.v -m * g * e3 +m * desired.x_2dot; %Appendix F, Control of Complex Maneuvers...
 b3 = R * e3; % eqn(3), Decoupled Yaw Control
@@ -71,16 +73,16 @@ ea = g * e3 ... % eqn(41), Decoupled Yaw Control
     - desired.x_2dot ...
     + param.x_delta / m;
 
-A_dot = - k.x * error.v ...  % derivative of A
+A_dot = - k.x * error.v ...  
     - k.v * ea ...
-    + m * desired.x_3dot ...;
+    + m * desired.x_3dot; 
 
 b3_dot = R * hat(W) * e3; %eqn 22 (Decoupled Yaw Control)
 f_dot = -dot(A_dot, b3) - dot(A, b3_dot);
 eb = - f_dot / m * b3 - f / m * b3_dot - desired.x_3dot; %time derivative of ea
 A_ddot = - k.x * ea ...
     - k.v * eb ...
-    + m * desired.x_4dot ...;
+    + m * desired.x_4dot;
 
 [b3c,b3c_dot,b3c_ddot] = deriv_unit_vector(-A,-A_dot,-A_ddot); %Appendix F, Control of Complex Maneuvers V3...
 

@@ -32,7 +32,7 @@ addpath('minimum_snap');
 
 
 %% Simulation parameters
-t = 0:0.01:25;
+t = 0:0.01:15;
 N = length(t);
 
 % Quadrotor
@@ -87,7 +87,7 @@ W = X(:, 7:9)';
 for i = 1:N
     R(:,:,i) = reshape(X(i,10:18), 3, 3);
     
-    des = command_lissajous(t(i));
+    des = command(t(i));
     [f(i), M(:,i),err, calc] = position_control(X(i,:)', des, ...
         k, param);
     
