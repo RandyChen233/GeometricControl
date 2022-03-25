@@ -1,21 +1,16 @@
-
-% function desired = command_lissajous(t)
-function desired = command_lissajous(t,waypoints)
-%% condition
-% A = 1;
-% B = 1;
-% C = 0.2;
-% 
-% d = pi / 2 * 0;
-% 
-% a = 1;
-% b = 2;
-% c = 2;
-% alt = -1;
-%m = 0:0.05:10;
-
-%waypts = [A * sin(a *m + d);B * sin(b * m);alt + C * cos(2 * m)];
-
+function [ desired_state ] = traj_generator(t, state, waypoints)
+% TRAJ_GENERATOR: Generate the trajectory passing through all
+% positions listed in the waypoints list
+%
+% t,state: time and current state (same variable as "state" in controller)
+% that you may use for computing desired_state
+%
+% waypoints: The 3xP matrix listing all the points you much visited in order
+% along the generated trajectory
+%
+% desired_state: Contains all the information that is passed to the
+% controller for generating inputs for the quadrotor
+%
 persistent waypoints0 traj_time d0 alpha_x alpha_y alpha_z
 if nargin > 2
     d = waypoints(:,2:end) - waypoints(:,1:end-1);
@@ -80,12 +75,10 @@ else
         desired_state.pos = waypoints0(:,end);
         desired_state.vel = zeros(3,1);
         desired_state.acc = zeros(3,1);
-        desired_state.snap = zeros(3,1);
     elseif(t == 0)
         desired_state.pos = waypoints0(:,1);
         desired_state.vel = zeros(3,1);
         desired_state.acc = zeros(3,1);
-        desired_state.snapc = zeros(3,1);
     else
         t_index = find(traj_time >= t,1) - 1;
         t = t - traj_time(t_index);
@@ -101,38 +94,9 @@ else
         desired_state.acc(1,1) = polyval(polyder(polyder(alpha_x(t_index,:))),scale)/d0(t_index)^2;
         desired_state.acc(2,1) = polyval(polyder(polyder(alpha_y(t_index,:))),scale)/d0(t_index)^2;
         desired_state.acc(3,1) = polyval(polyder(polyder(alpha_z(t_index,:))),scale)/d0(t_index)^2;
-        
-        desired_state.snap(1,1) = polyval(polyder(polyder(alpha_x(t_index,:))),scale)/d0(t_index)^3;
-        desired_state.snap(2,1) = polyval(polyder(polyder(alpha_y(t_index,:))),scale)/d0(t_index)^3;
-        desired_state.snap(3,1) = polyval(polyder(polyder(alpha_z(t_index,:))),scale)/d0(t_index)^3;
-
     end
     desired_state.yaw = 0;
-    desired_state.yawdot = 0; 
-
-
-% desired.x = [A * sin(a * t + d), B * sin(b * t), alt + C * cos(2 * t)]';
-% 
-% desired.v = [A * a * cos(a * t + d), ...
-%     B * b * cos(b * t), ...
-%     C * c * -sin(c * t)]';
-% 
-% desired.x_2dot = [A * a^2 * -sin(a * t + d), ...
-%     B * b^2 * -sin(b * t), ...
-%     C * c^2 * -cos(c * t)]';
-% 
-% desired.x_3dot = [A * a^3 * -cos(a * t + d), ...
-%     B * b^3 * -cos(b * t), ...
-%     C * c^3 * sin(c * t)]';
-% 
-% desired.x_4dot = [A * a^4 * sin(a * t + d), ...
-%     B * b^4 * sin(b * t), ...
-%     C * c^4 * cos(c * t)]';
-
-w = 2 * pi / 10;
-desired.b1 = [cos(w * t), sin(w * t), 0]';
-desired.b1_dot = w * [-sin(w * t), cos(w * t), 0]';
-desired.b1_2dot = w^2 * [-cos(w * t), -sin(w * t), 0]';
-
-
+    desired_state.yawdot = 0;
 end
+end
+
