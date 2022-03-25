@@ -12,7 +12,9 @@ a = 1;
 b = 2;
 c = 2;
 alt = -1;
-t = 0:0.1:25; %time
+
+t = 0:0.05:15;
+
 waypts = [A * sin(a *t + d);B * sin(b * t);alt + C * cos(2 * t)];
 
 v0 = [0,0,0];
@@ -68,14 +70,24 @@ for i=1:size(polys_x,2)
 end
 
 
+% saving data
+for i = 1:length(t)
+desired.x = [xx(i),yy(i),zz(i)]';
+desired.v = [vxx(i),vyy(i),vzz(i)]';
+desired.x_2dot = [axx(i),ayy(i),azz(i)]';
+desired.x_3dot = [jxx(i),jyy(i),jzz(i)]';
+desired.x_4dot = [sxx(i),syy(i),szz(i)]';
+end
 
-%% saving data
 
 % desired.x = [xx,yy,zz]';
 % desired.v = [vxx,vyy,vzz]';
 % desired.x_2dot = [axx,ayy,azz]';
 % desired.x_3dot = [jxx,jyy,jzz]';
 % desired.x_4dot = [sxx,syy,szz]';
+
+
+
 % 
 % desired.x = [A * sin(a *t + d),B * sin(b * t),alt + C * cos(2 * t)]';
 % 
@@ -97,9 +109,22 @@ end
 
 w = 2 * pi / 10;
 %t = linspace(0,t(end),size(xx,2));
-desired.b1 = [cos(w * t),sin(w * t), zeros(1,length(t))]';
-desired.b1_dot = w * [-sin(w * t),cos(w * t),zeros(1,length(t))]';
-desired.b1_2dot = w^2 * [-cos(w * t),-sin(w * t), zeros(1,length(t))]';
+figure;hold on;
+for i = 1:length(t)
+desired.b1 = [cos(w * t(i)),sin(w * t(i)), 0]';
+desired.b1_dot = w * [-sin(w * t(i)),cos(w * t(i)),0]';
+desired.b1_2dot = w^2 * [-cos(w * t(i)),-sin(w * t(i)), 0]';
+
+
+plot3(desired.b1(1,i),desired.b1(2,i),desired.b1(3))
+
+end
+hold off
+
+
+% desired.b1 = [cos(w * t),sin(w * t), zeros(1,length(t))]';
+% desired.b1_dot = w * [-sin(w * t),cos(w * t),zeros(1,length(t))]';
+% desired.b1_2dot = w^2 * [-cos(w * t),-sin(w * t), zeros(1,length(t))]';
 
 
 end

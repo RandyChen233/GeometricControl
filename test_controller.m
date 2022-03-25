@@ -32,7 +32,7 @@ addpath('minimum_snap');
 
 
 %% Simulation parameters
-t = 0:0.01:15;
+t = 0:0.05:15;
 N = length(t);
 
 % Quadrotor

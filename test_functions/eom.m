@@ -6,9 +6,7 @@ J = param.J;
 
 [~, v, R, W] = split_to_states(X);
 
-
 desired = command(t);
-
     
 [f, M, ~, ~] = position_control(X, desired, k, param);
 
