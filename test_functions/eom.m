@@ -6,21 +6,8 @@ J = param.J;
 
 [~, v, R, W] = split_to_states(X);
 
-A = 1;
-B = 1;
-C = 0.2;
 
-d = pi / 2 * 0;
-
-a = 1;
-b = 2;
-c = 2;
-alt = -1;
-m = 0:0.05:10;
-
-waypts = [A * sin(a *m + d);B * sin(b * m);alt + C * cos(2 * m)];
-
-desired = command_lissajous(t,waypts);
+desired = command(t);
     
 [f, M, ~, ~] = position_control(X, desired, k, param);
 
