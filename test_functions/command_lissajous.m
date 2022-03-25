@@ -76,6 +76,7 @@ if nargin > 2
     alpha_y = fliplr(reshape(alpha_y,n,[]));
     alpha_z = fliplr(reshape(alpha_z,n,[]));
 else
+    
     if(t > traj_time(end))
         desired_state.pos = waypoints0(:,end);
         desired_state.vel = zeros(3,1);
@@ -88,7 +89,7 @@ else
         desired_state.snapc = zeros(3,1);
     else
         t_index = find(traj_time >= t,1) - 1;
-        t = t - traj_time(t_index);
+        t= t - traj_time(t_index);
         scale = t/d0(t_index);
         desired_state.pos(1,1) = polyval(alpha_x(t_index,:),scale);
         desired_state.pos(2,1) = polyval(alpha_y(t_index,:),scale);
@@ -107,6 +108,7 @@ else
         desired_state.snap(3,1) = polyval(polyder(polyder(alpha_z(t_index,:))),scale)/d0(t_index)^3;
 
     end
+    
     desired_state.yaw = 0;
     desired_state.yawdot = 0; 
 
@@ -133,6 +135,5 @@ w = 2 * pi / 10;
 desired.b1 = [cos(w * t), sin(w * t), 0]';
 desired.b1_dot = w * [-sin(w * t), cos(w * t), 0]';
 desired.b1_2dot = w^2 * [-cos(w * t), -sin(w * t), 0]';
-
 
 end
