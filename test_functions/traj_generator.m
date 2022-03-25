@@ -1,4 +1,8 @@
 function [ desired_state ] = traj_generator(t, ~, waypoints)
+%%THIS function is from  
+% https://github.com/Shar-pei-bear/3D-Controller-and-Trajectory-Generation/blob/master/traj_generator.m
+
+
 % TRAJ_GENERATOR: Generate the trajectory passing through all
 % positions listed in the waypoints list
 %
@@ -71,38 +75,38 @@ if nargin > 2
     alpha_y = fliplr(reshape(alpha_y,n,[]));
     alpha_z = fliplr(reshape(alpha_z,n,[]));
 else
-    for i = 1:length(t)  %this part is modified such that the script can be tested in the command line
-        if(t(i) > traj_time(end))
-            desired_state.pos = waypoints0(:,end);
-            desired_state.vel = zeros(3,1);
-            %desired_state.acc = zeros(3,1);
-            %desired_state.snap = zeros(3,1);
-        elseif(t(i) == 0)
-            desired_state.pos = waypoints0(:,1);
-            desired_state.vel = zeros(3,1);
-            %desired_state.acc = zeros(3,1);
-            %desired_state.snap = zeros(3,1);
-        else
-            t_index = find(traj_time >= t(i),1) - 1;
-            t(i) = t(i) - traj_time(t_index);
-            scale = t(i)/d0(t_index);
-            desired_state.pos(1,1) = polyval(alpha_x(t_index,:),scale);
-            desired_state.pos(2,1) = polyval(alpha_y(t_index,:),scale);
-            desired_state.pos(3,1) = polyval(alpha_z(t_index,:),scale);
-                    
-            desired_state.vel(1,1) = polyval(polyder(alpha_x(t_index,:)),scale)/d0(t_index);
-            desired_state.vel(2,1) = polyval(polyder(alpha_y(t_index,:)),scale)/d0(t_index);
-            desired_state.vel(3,1) = polyval(polyder(alpha_z(t_index,:)),scale)/d0(t_index);
-            
-            desired_state.acc(1,1) = polyval(polyder(polyder(alpha_x(t_index,:))),scale)/d0(t_index)^2;
-            desired_state.acc(2,1) = polyval(polyder(polyder(alpha_y(t_index,:))),scale)/d0(t_index)^2;
-            desired_state.acc(3,1) = polyval(polyder(polyder(alpha_z(t_index,:))),scale)/d0(t_index)^2;
     
-            desired_state.snap(1,1) = polyval(polyder(polyder(alpha_x(t_index,:))),scale)/d0(t_index)^3;
-            desired_state.snap(2,1) = polyval(polyder(polyder(alpha_y(t_index,:))),scale)/d0(t_index)^3;
-            desired_state.snap(3,1) = polyval(polyder(polyder(alpha_z(t_index,:))),scale)/d0(t_index)^3;
+    if(t > traj_time(end))
+        desired_state.pos = waypoints0(:,end);
+        desired_state.vel = zeros(3,1);
+        %desired_state.acc = zeros(3,1);
+        %desired_state.snap = zeros(3,1);
+    elseif(t == 0)
+        desired_state.pos = waypoints0(:,1);
+        desired_state.vel = zeros(3,1);
+        %desired_state.acc = zeros(3,1);
+        %desired_state.snap = zeros(3,1);
+    else
+        t_index = find(traj_time >= t,1) - 1;
+        t = t - traj_time(t_index);
+        scale = t/d0(t_index);
+        desired_state.pos(1,1) = polyval(alpha_x(t_index,:),scale);
+        desired_state.pos(2,1) = polyval(alpha_y(t_index,:),scale);
+        desired_state.pos(3,1) = polyval(alpha_z(t_index,:),scale);
+                
+        desired_state.vel(1,1) = polyval(polyder(alpha_x(t_index,:)),scale)/d0(t_index);
+        desired_state.vel(2,1) = polyval(polyder(alpha_y(t_index,:)),scale)/d0(t_index);
+        desired_state.vel(3,1) = polyval(polyder(alpha_z(t_index,:)),scale)/d0(t_index);
+        
+        desired_state.acc(1,1) = polyval(polyder(polyder(alpha_x(t_index,:))),scale)/d0(t_index)^2;
+        desired_state.acc(2,1) = polyval(polyder(polyder(alpha_y(t_index,:))),scale)/d0(t_index)^2;
+        desired_state.acc(3,1) = polyval(polyder(polyder(alpha_z(t_index,:))),scale)/d0(t_index)^2;
 
-        end
+        desired_state.snap(1,1) = polyval(polyder(polyder(alpha_x(t_index,:))),scale)/d0(t_index)^3;
+        desired_state.snap(2,1) = polyval(polyder(polyder(alpha_y(t_index,:))),scale)/d0(t_index)^3;
+        desired_state.snap(3,1) = polyval(polyder(polyder(alpha_z(t_index,:))),scale)/d0(t_index)^3;
+
+        
     end
     desired_state.yaw = 0;
     desired_state.yawdot = 0;
